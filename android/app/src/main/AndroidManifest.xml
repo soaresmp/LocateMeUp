@@ -28,7 +28,7 @@
         <!-- REPLACE with your actual Google Maps API key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_API_KEY" />
+            android:value="AIzaSyA_LXOMGRUc1m_C6tYNtnkCaRuo8xik8Wc" />
 
         <!-- AdMob App ID -->
         <meta-data
