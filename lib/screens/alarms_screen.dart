@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -31,7 +33,6 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Re-check permissions when app returns to foreground
     if (state == AppLifecycleState.resumed) {
       _service.requestLocationPermission();
     }
@@ -102,12 +103,27 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
     );
   }
 
+  Future<void> _pickRingtone() async {
+    final info = await _service.ringtoneService.pick();
+    if (info != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ringtone: ${info.title}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Alarms'),
         actions: [
+          if (Platform.isAndroid)
+            IconButton(
+              icon: const Icon(Icons.music_note),
+              tooltip: 'Select ringtone',
+              onPressed: _pickRingtone,
+            ),
           IconButton(
             icon: const Icon(Icons.add_location_alt),
             tooltip: 'Add alarm',
@@ -117,6 +133,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
       ),
       body: Column(
         children: [
+          if (_service.isFiring) _buildStopAlarmBanner(),
           Expanded(child: _buildAlarmList()),
           if (_bannerAdLoaded && _bannerAd != null)
             SizedBox(
@@ -124,6 +141,45 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
               child: AdWidget(ad: _bannerAd!),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStopAlarmBanner() {
+    return Material(
+      color: Colors.red,
+      child: InkWell(
+        onTap: () => _service.stopAlarm(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(Icons.alarm_off, color: Colors.white, size: 28),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'STOP ALARM',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    if (_service.firingAlarmTitle != null)
+                      Text(
+                        'Arrived at ${_service.firingAlarmTitle}',
+                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                      ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.touch_app, color: Colors.white70),
+            ],
+          ),
+        ),
       ),
     );
   }

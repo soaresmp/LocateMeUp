@@ -11,6 +11,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.instance.initialize();
   await NotificationService.instance.initialize();
+  NotificationService.instance.onStopRequested = () => alarmService.stopAlarm();
   await alarmService.loadAlarms();
   runApp(const LocateMeUpApp());
 }

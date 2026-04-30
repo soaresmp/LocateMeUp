@@ -1,20 +1,23 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../models/alarm.dart';
 import 'notification_service.dart';
+import 'ringtone_service.dart';
 import 'storage_service.dart';
 
 class AlarmService extends ChangeNotifier {
   final StorageService _storage = StorageService();
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  final RingtoneService ringtoneService = RingtoneService();
 
   List<Alarm> alarms = [];
   Position? currentPosition;
   bool isLocationAuthorized = false;
+  bool isFiring = false;
+  String? firingAlarmTitle;
+  String? _firingAlarmId;
 
   StreamSubscription<Position>? _locationSubscription;
 
@@ -24,6 +27,7 @@ class AlarmService extends ChangeNotifier {
 
   Future<void> loadAlarms() async {
     alarms = await _storage.loadAlarms();
+    await ringtoneService.load();
     await requestLocationPermission();
     _updateLocationMonitoring();
     notifyListeners();
@@ -64,6 +68,19 @@ class AlarmService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Stop alarm ─────────────────────────────────────────────────────────────
+
+  Future<void> stopAlarm() async {
+    await ringtoneService.stop();
+    if (_firingAlarmId != null) {
+      await NotificationService.instance.cancelNotification(_firingAlarmId!);
+      _firingAlarmId = null;
+    }
+    isFiring = false;
+    firingAlarmTitle = null;
+    notifyListeners();
+  }
+
   // ── Location monitoring ────────────────────────────────────────────────────
 
   void _updateLocationMonitoring() {
@@ -78,7 +95,7 @@ class AlarmService extends ChangeNotifier {
     if (_locationSubscription != null) return;
     const settings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 100, // metres — mirrors iOS defaultDistanceFilter
+      distanceFilter: 100,
     );
     _locationSubscription =
         Geolocator.getPositionStream(locationSettings: settings).listen(_onLocationUpdate);
@@ -101,11 +118,14 @@ class AlarmService extends ChangeNotifier {
       if (alarm.isOn && alarm.isInRegion(position.latitude, position.longitude)) {
         alarm.isOn = false;
         changed = true;
+        isFiring = true;
+        firingAlarmTitle = alarm.title;
+        _firingAlarmId = alarm.id;
         NotificationService.instance.showAlarmNotification(
           id: alarm.id,
           locationTitle: alarm.title,
         );
-        _playAlarmSound();
+        ringtoneService.play();
       }
     }
     if (changed) {
@@ -113,14 +133,10 @@ class AlarmService extends ChangeNotifier {
     }
   }
 
-  Future<void> _playAlarmSound() async {
-    await _audioPlayer.play(AssetSource('wakeup.mp3'));
-  }
-
   @override
   void dispose() {
     _stopLocationMonitoring();
-    _audioPlayer.dispose();
+    ringtoneService.dispose();
     super.dispose();
   }
 }

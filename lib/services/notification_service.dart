@@ -6,6 +6,8 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
+  void Function()? onStopRequested;
+
   Future<void> initialize() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
@@ -14,9 +16,11 @@ class NotificationService {
       requestSoundPermission: true,
     );
     const settings = InitializationSettings(android: androidSettings, iOS: iosSettings);
-    await _plugin.initialize(settings);
+    await _plugin.initialize(
+      settings,
+      onDidReceiveNotificationResponse: _onResponse,
+    );
 
-    // Create the Android notification channel
     const channel = AndroidNotificationChannel(
       'alarm_channel',
       'Location Alarms',
@@ -26,6 +30,12 @@ class NotificationService {
     await _plugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
+  }
+
+  void _onResponse(NotificationResponse response) {
+    if (response.actionId == 'stop_alarm') {
+      onStopRequested?.call();
+    }
   }
 
   Future<void> showAlarmNotification({
@@ -38,16 +48,25 @@ class NotificationService {
       channelDescription: 'Notifications for location-based alarms',
       importance: Importance.max,
       priority: Priority.high,
-      playSound: true,
+      playSound: false,
+      ongoing: true,
+      autoCancel: false,
+      actions: [
+        AndroidNotificationAction('stop_alarm', 'Stop'),
+      ],
     );
     const iosDetails = DarwinNotificationDetails(badgeNumber: 1);
     const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
     await _plugin.show(
       id.hashCode,
-      'Wake Up',
+      'Wake Up!',
       'You are arriving at $locationTitle',
       details,
     );
+  }
+
+  Future<void> cancelNotification(String id) async {
+    await _plugin.cancel(id.hashCode);
   }
 }

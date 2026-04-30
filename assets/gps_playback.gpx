@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="LocateMeUp-test"
+     xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Approach Google HQ alarm point</name>
+    <trkseg>
+      <trkpt lat="37.440000" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:00:00Z</time>
+      </trkpt>
+      <trkpt lat="37.438200" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:00:15Z</time>
+      </trkpt>
+      <trkpt lat="37.436400" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:00:30Z</time>
+      </trkpt>
+      <trkpt lat="37.434600" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:00:45Z</time>
+      </trkpt>
+      <trkpt lat="37.432800" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:01:00Z</time>
+      </trkpt>
+      <trkpt lat="37.431000" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:01:15Z</time>
+      </trkpt>
+      <trkpt lat="37.429200" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:01:30Z</time>
+      </trkpt>
+      <trkpt lat="37.427400" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:01:45Z</time>
+      </trkpt>
+      <trkpt lat="37.425600" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:02:00Z</time>
+      </trkpt>
+      <trkpt lat="37.423800" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:02:15Z</time>
+      </trkpt>
+      <trkpt lat="37.422000" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:02:30Z</time>
+      </trkpt>
+      <trkpt lat="37.420200" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:02:45Z</time>
+      </trkpt>
+      <trkpt lat="37.418400" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:03:00Z</time>
+      </trkpt>
+      <trkpt lat="37.416600" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:03:15Z</time>
+      </trkpt>
+      <trkpt lat="37.414800" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:03:30Z</time>
+      </trkpt>
+      <trkpt lat="37.413000" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:03:45Z</time>
+      </trkpt>
+      <trkpt lat="37.411200" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:04:00Z</time>
+      </trkpt>
+      <trkpt lat="37.409400" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:04:15Z</time>
+      </trkpt>
+      <trkpt lat="37.407600" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:04:30Z</time>
+      </trkpt>
+      <trkpt lat="37.405800" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:04:45Z</time>
+      </trkpt>
+      <trkpt lat="37.404000" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:05:00Z</time>
+      </trkpt>
+      <trkpt lat="37.402200" lon="-122.084000">
+        <ele>5.0</ele>
+        <time>2024-06-01T09:05:15Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
