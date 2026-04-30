@@ -69,7 +69,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cannot LocateYouUp'),
+        title: const Text('Location required'),
         content: const Text('Please enable Location Services to use alarms.'),
         actions: [
           TextButton(
@@ -114,27 +114,50 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final activeCount = _service.activeAlarmCount;
+
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('My Alarms'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Alarms',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+            if (_service.alarms.isNotEmpty)
+              Text(
+                activeCount == 0
+                    ? 'All alarms off'
+                    : '$activeCount alarm${activeCount == 1 ? '' : 's'} active',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                  color: activeCount > 0
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withOpacity(0.5),
+                ),
+              ),
+          ],
+        ),
         actions: [
           if (Platform.isAndroid)
             IconButton(
-              icon: const Icon(Icons.music_note),
+              icon: const Icon(Icons.music_note_outlined),
               tooltip: 'Select ringtone',
               onPressed: _pickRingtone,
             ),
-          IconButton(
-            icon: const Icon(Icons.add_location_alt),
-            tooltip: 'Add alarm',
-            onPressed: _openMapScreen,
-          ),
         ],
       ),
       body: Column(
         children: [
-          if (_service.isFiring) _buildStopAlarmBanner(),
-          Expanded(child: _buildAlarmList()),
+          if (_service.isFiring) _buildStopAlarmBanner(theme),
+          Expanded(child: _buildAlarmList(theme)),
           if (_bannerAdLoaded && _bannerAd != null)
             SizedBox(
               height: _bannerAd!.size.height.toDouble(),
@@ -142,20 +165,25 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
             ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openMapScreen,
+        icon: const Icon(Icons.add_location_alt_outlined),
+        label: const Text('Add alarm'),
+      ),
     );
   }
 
-  Widget _buildStopAlarmBanner() {
+  Widget _buildStopAlarmBanner(ThemeData theme) {
     return Material(
-      color: Colors.red,
+      color: Colors.red.shade600,
       child: InkWell(
         onTap: () => _service.stopAlarm(),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           child: Row(
             children: [
-              const Icon(Icons.alarm_off, color: Colors.white, size: 28),
-              const SizedBox(width: 16),
+              const Icon(Icons.alarm_off, color: Colors.white, size: 26),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +193,8 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 16,
+                        letterSpacing: 0.5,
                       ),
                     ),
                     if (_service.firingAlarmTitle != null)
@@ -176,7 +205,21 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
                   ],
                 ),
               ),
-              const Icon(Icons.touch_app, color: Colors.white70),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Stop',
+                  style: TextStyle(
+                    color: Colors.red.shade600,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -184,29 +227,45 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
     );
   }
 
-  Widget _buildAlarmList() {
+  Widget _buildAlarmList(ThemeData theme) {
     if (_service.alarms.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text(
-            'No alarms yet.\nTap + to add a location alarm.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.add_location_alt_outlined,
+              size: 72,
+              color: theme.colorScheme.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'No alarms yet',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tap "Add alarm" to set a location alarm',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.4),
+              ),
+            ),
+            const SizedBox(height: 80),
+          ],
         ),
       );
     }
 
-    return ListView.separated(
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 8, bottom: 96),
       itemCount: _service.alarms.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final alarm = _service.alarms[index];
         final pos = _service.currentPosition;
-        final distanceMeters = pos != null
-            ? alarm.distanceMeters(pos.latitude, pos.longitude)
-            : null;
+        final distanceMeters =
+            pos != null ? alarm.distanceMeters(pos.latitude, pos.longitude) : null;
 
         return AlarmTile(
           alarm: alarm,

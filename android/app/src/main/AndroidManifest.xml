@@ -19,6 +19,10 @@
     <!-- Receive boot to restart background location if needed -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Foreground service for continuous background location -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
     <application
         android:label="LocateMeUp"
         android:name="${applicationName}"
@@ -68,5 +72,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <service
+            android:name=".LocationForegroundService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
     </application>
 </manifest>

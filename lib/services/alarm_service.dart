@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../models/alarm.dart';
@@ -9,6 +11,8 @@ import 'ringtone_service.dart';
 import 'storage_service.dart';
 
 class AlarmService extends ChangeNotifier {
+  static const _locationChannel = MethodChannel('com.locatemeup/location');
+
   final StorageService _storage = StorageService();
   final RingtoneService ringtoneService = RingtoneService();
 
@@ -86,9 +90,25 @@ class AlarmService extends ChangeNotifier {
   void _updateLocationMonitoring() {
     if (activeAlarmCount > 0 && isLocationAuthorized) {
       _startLocationMonitoring();
+      _startForegroundService();
     } else {
       _stopLocationMonitoring();
+      _stopForegroundService();
     }
+  }
+
+  Future<void> _startForegroundService() async {
+    if (!Platform.isAndroid) return;
+    try {
+      await _locationChannel.invokeMethod<void>('startService');
+    } catch (_) {}
+  }
+
+  Future<void> _stopForegroundService() async {
+    if (!Platform.isAndroid) return;
+    try {
+      await _locationChannel.invokeMethod<void>('stopService');
+    } catch (_) {}
   }
 
   void _startLocationMonitoring() {

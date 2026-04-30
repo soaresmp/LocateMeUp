@@ -12,7 +12,8 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
 
-    private val CHANNEL = "com.locatemeup/ringtone"
+    private val RINGTONE_CHANNEL = "com.locatemeup/ringtone"
+    private val LOCATION_CHANNEL = "com.locatemeup/location"
     private val RINGTONE_REQUEST = 9001
     private var mediaPlayer: MediaPlayer? = null
     private var pendingResult: MethodChannel.Result? = null
@@ -20,7 +21,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, RINGTONE_CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "pickRingtone" -> {
@@ -40,7 +41,6 @@ class MainActivity : FlutterActivity() {
                         @Suppress("DEPRECATION")
                         startActivityForResult(intent, RINGTONE_REQUEST)
                     }
-
                     "playRingtone" -> {
                         releasePlayer()
                         try {
@@ -60,12 +60,30 @@ class MainActivity : FlutterActivity() {
                             result.error("PLAY_ERROR", e.message, null)
                         }
                     }
-
                     "stopRingtone" -> {
                         releasePlayer()
                         result.success(null)
                     }
+                    else -> result.notImplemented()
+                }
+            }
 
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, LOCATION_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "startService" -> {
+                        val intent = Intent(this, LocationForegroundService::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(intent)
+                        } else {
+                            startService(intent)
+                        }
+                        result.success(null)
+                    }
+                    "stopService" -> {
+                        stopService(Intent(this, LocationForegroundService::class.java))
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }
