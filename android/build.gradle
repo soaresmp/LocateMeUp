@@ -3,12 +3,18 @@ allprojects {
         google()
         mavenCentral()
     }
-}
-
-subprojects {
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        kotlinOptions {
-            freeCompilerArgs += ["-Xskip-metadata-version-check"]
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == "org.jetbrains.kotlin") {
+                def name = details.requested.name
+                if (name == "kotlin-stdlib" ||
+                        name == "kotlin-stdlib-jdk7" ||
+                        name == "kotlin-stdlib-jdk8" ||
+                        name == "kotlin-stdlib-common") {
+                    details.useVersion "2.1.0"
+                    details.because "Pin stdlib to match Flutter SDK's effective Kotlin compiler 2.1.0"
+                }
+            }
         }
     }
 }
