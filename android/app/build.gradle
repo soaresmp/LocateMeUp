@@ -36,7 +36,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs += ["-Xskip-metadata-version-check"]
+        freeCompilerArgs = freeCompilerArgs + ["-Xskip-metadata-version-check"]
     }
 
     sourceSets {
