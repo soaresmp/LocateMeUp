@@ -190,7 +190,10 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Press map to mark locations'),
+        title: const Text(
+          'Long-press map to mark locations',
+          style: TextStyle(fontSize: 14),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -202,11 +205,6 @@ class _MapScreenState extends State<MapScreen> {
               }
             }),
           ),
-          if (_markerAlarms.isNotEmpty)
-            TextButton(
-              onPressed: _save,
-              child: const Text('Save'),
-            ),
         ],
       ),
       body: Stack(
@@ -226,6 +224,28 @@ class _MapScreenState extends State<MapScreen> {
             onLongPress: _onLongPress,
           ),
           if (_showSearch) _buildSearchOverlay(),
+          if (_markerAlarms.isNotEmpty)
+            Positioned(
+              left: 24,
+              right: 24,
+              bottom: 32,
+              child: SafeArea(
+                child: FilledButton.icon(
+                  onPressed: _save,
+                  icon: const Icon(Icons.check),
+                  label: Text(
+                    'Save ${_markerAlarms.length == 1 ? 'alarm' : '${_markerAlarms.length} alarms'}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
