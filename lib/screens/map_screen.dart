@@ -53,7 +53,7 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _moveToCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        desiredAccuracy: LocationAccuracy.high,
       );
       _mapController?.animateCamera(
         CameraUpdate.newLatLngZoom(
