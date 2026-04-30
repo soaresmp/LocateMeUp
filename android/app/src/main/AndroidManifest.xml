@@ -23,6 +23,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
+    <!-- Bring app to foreground when alarm fires (full-screen intent) -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <application
         android:label="LocateMeUp"
         android:name="${applicationName}"

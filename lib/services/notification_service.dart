@@ -51,6 +51,8 @@ class NotificationService {
       playSound: false,
       ongoing: true,
       autoCancel: false,
+      fullScreenIntent: true,
+      category: AndroidNotificationCategory.alarm,
       actions: [
         AndroidNotificationAction('stop_alarm', 'Stop'),
       ],

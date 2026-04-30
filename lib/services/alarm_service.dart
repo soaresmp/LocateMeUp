@@ -111,6 +111,13 @@ class AlarmService extends ChangeNotifier {
     } catch (_) {}
   }
 
+  Future<void> _bringToForeground() async {
+    if (!Platform.isAndroid) return;
+    try {
+      await _locationChannel.invokeMethod<void>('bringToForeground');
+    } catch (_) {}
+  }
+
   void _startLocationMonitoring() {
     if (_locationSubscription != null) return;
     const settings = LocationSettings(
@@ -146,6 +153,7 @@ class AlarmService extends ChangeNotifier {
           locationTitle: alarm.title,
         );
         ringtoneService.play();
+        _bringToForeground();
       }
     }
     if (changed) {
