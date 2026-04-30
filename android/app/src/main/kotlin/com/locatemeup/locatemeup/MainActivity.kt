@@ -84,6 +84,13 @@ class MainActivity : FlutterActivity() {
                         stopService(Intent(this, LocationForegroundService::class.java))
                         result.success(null)
                     }
+                    "bringToForeground" -> {
+                        val intent = Intent(this, MainActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        }
+                        startActivity(intent)
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }
