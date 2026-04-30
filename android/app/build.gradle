@@ -28,6 +28,15 @@ android {
     compileSdk 36
     ndkVersion "28.2.13676358"
 
+    // Resolve NDK path: ndk.dir > sdk.dir/ndk/<version> (local.properties)
+    def _ndkDir = localProperties.getProperty("ndk.dir")
+    def _sdkDir = localProperties.getProperty("sdk.dir")
+    if (_ndkDir) {
+        ndkPath _ndkDir
+    } else if (_sdkDir) {
+        ndkPath "${_sdkDir}/ndk/28.2.13676358"
+    }
+
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
@@ -72,8 +81,10 @@ android {
         }
     }
 
-    packagingOptions {
-        doNotStrip "**/*.so"
+    packaging {
+        jniLibs {
+            keepDebugSymbols += ["**/*.so"]
+        }
     }
 }
 
