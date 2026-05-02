@@ -57,7 +57,7 @@ class RingtoneService {
         return;
       } catch (_) {}
     }
-    await _fallback.play(AssetSource('wakeup.mp3'));
+    await _fallback.play(AssetSource('wakeup.wav'));
   }
 
   Future<void> stop() async {
