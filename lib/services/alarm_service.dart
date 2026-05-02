@@ -164,7 +164,6 @@ class AlarmService extends ChangeNotifier {
   @override
   void dispose() {
     _stopLocationMonitoring();
-    ringtoneService.dispose();
     super.dispose();
   }
 }
