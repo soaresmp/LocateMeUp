@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0"
+    toolsVersion="21701" targetRuntime="AppleCocoaTouch" propertyAccessControl="none"
+    useAutolayout="YES" launchScreen="YES" useTraitCollections="YES"
+    useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+  <device id="retina6_12" orientation="portrait" appearance="light"/>
+  <dependencies>
+    <deployment identifier="iOS"/>
+    <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+    <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+    <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="EHf-IW-A2E">
+      <objects>
+        <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+          <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+              <!-- Pin icon centred on screen -->
+              <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO"
+                  id="pin-outer" userLabel="PinOuter">
+                <rect key="frame" x="156.5" y="346" width="80" height="110"/>
+                <!-- circle top of pin -->
+                <subviews>
+                  <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO"
+                      layer.cornerRadius="30" id="pin-circle" userLabel="PinCircle">
+                    <rect key="frame" x="10" y="0" width="60" height="60"/>
+                    <color key="backgroundColor" white="1" alpha="1"/>
+                  </view>
+                  <!-- tail triangle approximation -->
+                  <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO"
+                      id="pin-tail" userLabel="PinTail">
+                    <rect key="frame" x="22" y="50" width="36" height="60"/>
+                    <color key="backgroundColor" white="1" alpha="1"/>
+                  </view>
+                </subviews>
+                <color key="backgroundColor" clearColor="YES"/>
+              </view>
+              <!-- App name label -->
+              <label opaque="NO" userInteractionEnabled="NO"
+                  contentMode="left" horizontalHuggingPriority="251"
+                  verticalHuggingPriority="251" text="LocateMeUp"
+                  textAlignment="center" lineBreakMode="middleTruncation"
+                  translatesAutoresizingMaskIntoConstraints="NO" id="app-label">
+                <rect key="frame" x="96.5" y="480" width="200" height="36"/>
+                <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
+                <color key="textColor" white="1" alpha="1"/>
+                <nil key="highlightedColor"/>
+              </label>
+            </subviews>
+            <viewLayoutGuide key="safeAreaLayoutGuide" id="Bcu-3y-fUS"/>
+            <!-- #1565C0 blue background -->
+            <color key="backgroundColor"
+                red="0.08235294117647059" green="0.39607843137254903"
+                blue="0.75294117647058829" alpha="1"
+                colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+              <constraint firstItem="pin-outer" firstAttribute="centerX"
+                  secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="cx1"/>
+              <constraint firstItem="pin-outer" firstAttribute="centerY"
+                  secondItem="Ze5-6b-2t3" secondAttribute="centerY"
+                  constant="-40" id="cy1"/>
+              <constraint firstItem="pin-outer" firstAttribute="width"
+                  secondItem="pin-outer" secondAttribute="height"
+                  multiplier="0.727" id="ar1"/>
+              <constraint firstAttribute="width" secondItem="pin-outer"
+                  secondAttribute="width" constant="313" id="w1"/>
+              <constraint firstItem="app-label" firstAttribute="centerX"
+                  secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="cx2"/>
+              <constraint firstItem="app-label" firstAttribute="top"
+                  secondItem="pin-outer" secondAttribute="bottom"
+                  constant="24" id="top2"/>
+              <constraint firstItem="app-label" firstAttribute="width"
+                  secondItem="Ze5-6b-2t3" secondAttribute="width"
+                  multiplier="0.6" id="w2"/>
+            </constraints>
+          </view>
+        </viewController>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Eg1"
+            userLabel="First Responder" sceneMemberID="firstResponder"/>
+      </objects>
+    </scene>
+  </scenes>
+</document>
