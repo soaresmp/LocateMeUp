@@ -104,12 +104,56 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
   }
 
   Future<void> _pickRingtone() async {
-    final info = await _service.ringtoneService.pick();
-    if (info != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ringtone: ${info.title}')),
-      );
+    if (Platform.isAndroid) {
+      final info = await _service.ringtoneService.pick();
+      if (info != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ringtone: ${info.title}')),
+        );
+      }
+    } else if (Platform.isIOS) {
+      await _showIosTonePicker();
     }
+  }
+
+  Future<void> _showIosTonePicker() async {
+    final tones = await _service.ringtoneService.getAvailableTones();
+    if (!mounted || tones.isEmpty) return;
+    final current = _service.ringtoneService.selected;
+    await showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text('Select Alarm Tone',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            ),
+            ...tones.map((tone) => ListTile(
+                  title: Text(tone.title),
+                  trailing: current?.uri == tone.uri
+                      ? const Icon(Icons.check, color: Colors.blue)
+                      : null,
+                  onTap: () async {
+                    await _service.ringtoneService.select(tone);
+                    if (mounted) Navigator.pop(ctx);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Tone: ${tone.title}')),
+                      );
+                    }
+                  },
+                )),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -146,10 +190,10 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
           ],
         ),
         actions: [
-          if (Platform.isAndroid)
+          if (Platform.isAndroid || Platform.isIOS)
             IconButton(
               icon: const Icon(Icons.music_note_outlined),
-              tooltip: 'Select ringtone',
+              tooltip: 'Select alarm tone',
               onPressed: _pickRingtone,
             ),
         ],

@@ -26,6 +26,8 @@ class RingtoneService {
     }
   }
 
+  /// Android: opens system ringtone picker.
+  /// iOS: returns null — caller should use [getAvailableTones] + [select].
   Future<RingtoneInfo?> pick() async {
     if (!Platform.isAndroid) return null;
     try {
@@ -37,25 +39,48 @@ class RingtoneService {
         uri: raw['uri']! as String,
         title: raw['title']! as String,
       );
-      _selected = info;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kUri, info.uri);
-      await prefs.setString(_kTitle, info.title);
+      await _saveSelection(info);
       return info;
     } catch (_) {
       return null;
     }
   }
 
+  /// iOS only: returns the list of preset tones.
+  Future<List<RingtoneInfo>> getAvailableTones() async {
+    if (!Platform.isIOS) return [];
+    try {
+      final raw = await _ch.invokeMethod<List<Object?>>('getAvailableTones');
+      return (raw ?? []).map((e) {
+        final m = e as Map<Object?, Object?>;
+        return RingtoneInfo(uri: m['id'] as String, title: m['title'] as String);
+      }).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> select(RingtoneInfo info) async {
+    _selected = info;
+    await _saveSelection(info);
+  }
+
+  Future<void> _saveSelection(RingtoneInfo info) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kUri, info.uri);
+    await prefs.setString(_kTitle, info.title);
+    _selected = info;
+  }
+
   Future<void> play() async {
-    if (!Platform.isAndroid) return;
+    if (!Platform.isAndroid && !Platform.isIOS) return;
     try {
       await _ch.invokeMethod<void>('playRingtone', {'uri': _selected?.uri});
     } catch (_) {}
   }
 
   Future<void> stop() async {
-    if (!Platform.isAndroid) return;
+    if (!Platform.isAndroid && !Platform.isIOS) return;
     try {
       await _ch.invokeMethod<void>('stopRingtone');
     } catch (_) {}
