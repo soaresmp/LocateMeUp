@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,8 +13,6 @@ class RingtoneService {
   static const _ch = MethodChannel('com.locatemeup/ringtone');
   static const _kUri = 'ringtone_uri';
   static const _kTitle = 'ringtone_title';
-
-  final AudioPlayer _fallback = AudioPlayer();
 
   RingtoneInfo? _selected;
   RingtoneInfo? get selected => _selected;
@@ -51,23 +48,16 @@ class RingtoneService {
   }
 
   Future<void> play() async {
-    if (Platform.isAndroid) {
-      try {
-        await _ch.invokeMethod<void>('playRingtone', {'uri': _selected?.uri});
-        return;
-      } catch (_) {}
-    }
-    await _fallback.play(AssetSource('wakeup.wav'));
+    if (!Platform.isAndroid) return;
+    try {
+      await _ch.invokeMethod<void>('playRingtone', {'uri': _selected?.uri});
+    } catch (_) {}
   }
 
   Future<void> stop() async {
-    if (Platform.isAndroid) {
-      try {
-        await _ch.invokeMethod<void>('stopRingtone');
-      } catch (_) {}
-    }
-    await _fallback.stop();
+    if (!Platform.isAndroid) return;
+    try {
+      await _ch.invokeMethod<void>('stopRingtone');
+    } catch (_) {}
   }
-
-  void dispose() => _fallback.dispose();
 }
