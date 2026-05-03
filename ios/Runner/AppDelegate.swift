@@ -55,16 +55,14 @@ import GoogleMaps
         audioPlayer?.stop()
         audioPlayer = nil
 
-        guard let url = Bundle.main.url(
-            forResource: id,
-            withExtension: "wav",
-            subdirectory: "flutter_assets/assets/tones"
-        ) else {
+        let wavPath = Bundle.main.bundlePath + "/flutter_assets/assets/tones/\(id).wav"
+        guard FileManager.default.fileExists(atPath: wavPath) else {
             result(FlutterError(code: "NOT_FOUND",
-                                message: "Tone '\(id)' not found in bundle",
+                                message: "Tone '\(id)' not found at \(wavPath)",
                                 details: nil))
             return
         }
+        let url = URL(fileURLWithPath: wavPath)
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .default, options: [.duckOthers])

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -119,41 +120,53 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
   Future<void> _showIosTonePicker() async {
     final tones = await _service.ringtoneService.getAvailableTones();
     if (!mounted || tones.isEmpty) return;
-    final current = _service.ringtoneService.selected;
+
     await showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Text('Select Alarm Tone',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          final current = _service.ringtoneService.selected;
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Text('Select Alarm Tone',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                ),
+                ...tones.map((tone) => ListTile(
+                      title: Text(tone.title),
+                      trailing: current?.uri == tone.uri
+                          ? const Icon(Icons.check, color: Colors.blue)
+                          : null,
+                      onTap: () async {
+                        await _service.ringtoneService.select(tone);
+                        setSheetState(() {});
+                        unawaited(_service.ringtoneService.play());
+                      },
+                    )),
+                const SizedBox(height: 8),
+              ],
             ),
-            ...tones.map((tone) => ListTile(
-                  title: Text(tone.title),
-                  trailing: current?.uri == tone.uri
-                      ? const Icon(Icons.check, color: Colors.blue)
-                      : null,
-                  onTap: () async {
-                    await _service.ringtoneService.select(tone);
-                    if (mounted) Navigator.pop(ctx);
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Tone: ${tone.title}')),
-                      );
-                    }
-                  },
-                )),
-            const SizedBox(height: 8),
-          ],
-        ),
+          );
+        },
       ),
     );
+
+    // Stop preview when sheet is dismissed
+    await _service.ringtoneService.stop();
+    if (mounted) {
+      final selected = _service.ringtoneService.selected;
+      if (selected != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tone: ${selected.title}')),
+        );
+      }
+    }
   }
 
   @override
