@@ -7,6 +7,7 @@ import GoogleMaps
 @objc class AppDelegate: FlutterAppDelegate {
 
     private var audioPlayer: AVAudioPlayer?
+    private var ringtoneChannel: FlutterMethodChannel?
 
     override func application(
         _ application: UIApplication,
@@ -20,11 +21,12 @@ import GoogleMaps
         guard let controller = window?.rootViewController as? FlutterViewController else {
             return result
         }
-        let channel = FlutterMethodChannel(
+        // Store as property — local var gets deallocated on return, removing the handler
+        ringtoneChannel = FlutterMethodChannel(
             name: "com.locatemeup/ringtone",
             binaryMessenger: controller.binaryMessenger
         )
-        channel.setMethodCallHandler { [weak self] call, result in
+        ringtoneChannel?.setMethodCallHandler { [weak self] call, result in
             self?.handleRingtone(call: call, result: result)
         }
         return result
