@@ -146,7 +146,16 @@ class _AlarmsScreenState extends State<AlarmsScreen> with WidgetsBindingObserver
                       onTap: () async {
                         await _service.ringtoneService.select(tone);
                         setSheetState(() {});
-                        unawaited(_service.ringtoneService.play());
+                        final error = await _service.ringtoneService.play();
+                        if (error != null && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Audio error: $error'),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 6),
+                            ),
+                          );
+                        }
                       },
                     )),
                 const SizedBox(height: 8),

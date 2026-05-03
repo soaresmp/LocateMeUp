@@ -72,11 +72,17 @@ class RingtoneService {
     _selected = info;
   }
 
-  Future<void> play() async {
-    if (!Platform.isAndroid && !Platform.isIOS) return;
+  /// Returns null on success, or an error string on failure.
+  Future<String?> play() async {
+    if (!Platform.isAndroid && !Platform.isIOS) return null;
     try {
-      await _ch.invokeMethod<void>('playRingtone', {'uri': _selected?.uri});
-    } catch (_) {}
+      await _ch.invokeMethod<void>('playRingtone', {'uri': _selected?.uri ?? 'beep'});
+      return null;
+    } on PlatformException catch (e) {
+      return '${e.code}: ${e.message}';
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   Future<void> stop() async {
