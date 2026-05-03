@@ -11,7 +11,13 @@ import AVFoundation
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        let controller = window?.rootViewController as! FlutterViewController
+        GeneratedPluginRegistrant.register(with: self)
+        let result = super.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        // Window is initialised by super — safe to access now
+        guard let controller = window?.rootViewController as? FlutterViewController else {
+            return result
+        }
         let channel = FlutterMethodChannel(
             name: "com.locatemeup/ringtone",
             binaryMessenger: controller.binaryMessenger
@@ -19,8 +25,7 @@ import AVFoundation
         channel.setMethodCallHandler { [weak self] call, result in
             self?.handleRingtone(call: call, result: result)
         }
-        GeneratedPluginRegistrant.register(with: self)
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        return result
     }
 
     private func handleRingtone(call: FlutterMethodCall, result: @escaping FlutterResult) {
