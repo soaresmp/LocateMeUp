@@ -53,6 +53,8 @@ import GoogleMaps
 
     private func playTone(id: String, result: @escaping FlutterResult) {
         audioPlayer?.stop()
+        audioPlayer = nil
+
         guard let url = Bundle.main.url(
             forResource: id,
             withExtension: "wav",
@@ -64,10 +66,12 @@ import GoogleMaps
             return
         }
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.duckOthers])
+            try session.setActive(true, options: [])
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.numberOfLoops = -1
+            audioPlayer?.prepareToPlay()
             audioPlayer?.play()
             result(nil)
         } catch {
